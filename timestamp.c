@@ -1,8 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "timestamp.h"
+
+Types typeVerify(char *valorStr) {
+
+    if (strcmp(valorStr, "true") == 0 || strcmp(valorStr, "false") == 0) {
+        return BOOLEAN;
+    }
+      
+    char* endptr;
+    strtod(valorStr, &endptr);
+    
+    if (*endptr == '\0' || *endptr == '\n') {
+        if (strchr(valorStr, '.') != NULL) {
+            return DOUBLE;
+        } else {
+            return INTEGER;
+        }
+    }
+    
+    return STRING;
+}
 
 int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
 
@@ -41,7 +62,51 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
         return 0;
     }
 
-    return 1; //retorna "verdadeiro" caso não caia em nenhum if
+    return 1;
+}
+
+sensor_t getRegister(char *linha) {
+
+    sensor_t thisRegister;
+    sensor_t err = {0};
+
+    static char buffer[256];
+    strcpy(buffer, linha);
+    
+    char *token = strtok(buffer, " "); 
+    if (token == NULL) return err;
+    thisRegister.timestamp = atoi(token);
+    
+    token = strtok(NULL, " "); 
+    if (token == NULL) return err;
+    strcpy(thisRegister.name, token);
+      token = strtok(NULL, ""); 
+    if (token == NULL) return err;
+    thisRegister.type = typeVerify(token);
+
+    switch (thisRegister.type) {
+        case BOOLEAN:
+            if (strcmp(token, "true") == 0) {
+                thisRegister.value.boolType = 1;
+            } else {
+                thisRegister.value.boolType = 0;
+            }
+            break;
+        case INTEGER:
+            thisRegister.value.intType = atoi(token);
+            break;
+        case DOUBLE:
+            thisRegister.value.doubleType = atof(token);
+            break;        case STRING:
+            strncpy(thisRegister.value.stringType, token, sizeof(thisRegister.value.stringType) - 1);
+            thisRegister.value.stringType[sizeof(thisRegister.value.stringType) - 1] = '\0';
+            break;
+        default:
+            return err;
+            break;
+    }
+
+    return thisRegister;
 }
 
 time_t converter_para_timestap(int dia, int mes, int ano, int hora, int min, int seg) {
@@ -67,6 +132,9 @@ time_t converter_para_timestap(int dia, int mes, int ano, int hora, int min, int
 }
 
 time_t gerar_timestamp_aleatorio(struct tm * inicial, struct tm * final) {
+
+    inicial->tm_isdst = -1;
+    final->tm_isdst= -1;
     
     time_t timestamp_inicial, timestamp_final;
         
@@ -82,7 +150,7 @@ time_t gerar_timestamp_aleatorio(struct tm * inicial, struct tm * final) {
         return -1;
     }
 
-    time_t timestamp_aleatorio = timestamp_inicial + rand() % (timestamp_final - timestamp_inicial + 1);
+    time_t timestamp_aleatorio = timestamp_inicial + (time_t)((double)rand() / RAND_MAX * (timestamp_final - timestamp_inicial));
     
     return timestamp_aleatorio;
 }

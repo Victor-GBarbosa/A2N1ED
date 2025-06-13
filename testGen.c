@@ -18,7 +18,7 @@ void printTm(struct tm *DateTime) {
 
 int main (int argc, char *argv[]) {
 
-    //Validação dos argumentos
+    //validação dos argumentos
 
     if (argc < 6) {
         printf("Erro: Argumentos insuficientes");
@@ -67,17 +67,16 @@ int main (int argc, char *argv[]) {
     char stringValue[stringSize];
     char senString[256];
 
-    for (int i = 0; i < sensorCount; i++) {
-
-        char fname[20];
-        snprintf(fname, sizeof(fname), "%s.txt", sensors[i].name);
+    char fname[]= "sensores.txt";
 
         fp = fopen(fname, "a+");
 
         if (fp == NULL) {
             printf("Erro ao abrir ou criar o arquivo %s\n", fname);
-            return 0;
+            return 1;
         }
+
+    for (int i = 0; i < sensorCount; i++) {
 
         for (int j = 0; j < sensorQuantity; j++) {
             sensor_t sensor = {};
@@ -103,14 +102,14 @@ int main (int argc, char *argv[]) {
                 snprintf(senString, sizeof(senString), "%d %s %.2f\n", 
                  sensor.timestamp, sensor.name, sensor.value.doubleType);
                 break;
-
+                
             case STRING:
-                for (int i = 0; i < stringSize-1; i++) {
-                    stringValue[i] = charset[rand() % sizeof(charset) - 1] ;
+                for (int k = 0; k < stringSize-1; k++) {
+                    stringValue[k] = charset[rand() % (sizeof(charset) - 1)] ;
                 }
                 stringValue[stringSize - 1] = '\0';
-                // sensor.value.stringType = stringValue;
-                strncpy(sensor.value.stringType, stringValue, sizeof(sensor.value.stringType));
+                strncpy(sensor.value.stringType, stringValue, sizeof(sensor.value.stringType) - 1);
+                sensor.value.stringType[sizeof(sensor.value.stringType) - 1] = '\0';
                 snprintf(senString, sizeof(senString), "%d %s %s\n", 
                  sensor.timestamp, sensor.name, sensor.value.stringType);
                 break;
@@ -122,9 +121,9 @@ int main (int argc, char *argv[]) {
             }
             fputs(senString, fp);
         }
-        fclose(fp);
+        
     }
-
+    fclose(fp);
     printf("\nfinalizando");
     return 0;
 
