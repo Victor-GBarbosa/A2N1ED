@@ -6,25 +6,11 @@
 
 #define MAX_SENSORES 100
 
-int contarLinhas(char* fileName, int ignore) {
-   FILE *fp = fopen(fileName, "r");
-   if (fp == NULL) {
-      printf("Erro ao abrir o arquivo 2");
-       return -1;
-   }
-   int contador = 0;
-   char linha[256]; 
-   while (fgets(linha, sizeof(linha), fp) != NULL) {
-       contador++; 
-   }
-   fclose(fp);
-   return contador - ignore;
-}
-
 int main (int argc, char *argv[]) {
 
     char fname[256];
-    strcpy(fname, argv[1]);
+    strncpy(fname, argv[1], sizeof(fname) - 1);
+    fname[sizeof(fname) - 1] = '\0';
     printf("String copiada\n");
     printf(fname);
     int fileLineCounter = contarLinhas(fname, 0);
@@ -63,12 +49,11 @@ int main (int argc, char *argv[]) {
             }
         }
         
-        
-        if (!senVerify) {
+          if (!senVerify) {
             for (int c = 0; c < MAX_SENSORES; c++) {
                 if (nomeSensores[c] == NULL) {
                     nomeSensores[c] = malloc(strlen(registros[registrosValidos].name) + 1);
-                    strcpy(nomeSensores[c], registros[registrosValidos].name);
+                    strncpy(nomeSensores[c], registros[registrosValidos].name, strlen(registros[registrosValidos].name) + 1);
                     break;
                 }
             }
@@ -151,10 +136,10 @@ int main (int argc, char *argv[]) {
 
     while (nomeSensores[nsi] != NULL) {
         sFName = malloc(strlen(nomeSensores[nsi]) + 5);
-        sprintf(sFName,"%s.txt", nomeSensores[nsi]);
-        printf("Dbg 2\n");
+        sprintf(sFName,"%s.txt", nomeSensores[nsi]);        printf("Dbg 2\n");
         if (sFName == NULL) {
             printf("Erro ao alocar memoria para o nome do arquivo: %s.txt", nomeSensores[nsi]);
+            free(sFName);
             break;
         }
         printf("Dbg 3\n");
@@ -162,6 +147,7 @@ int main (int argc, char *argv[]) {
 
         if (fp == NULL) {
             printf("Erro ao criar o arquivo %s.txt", sFName);
+            free(sFName);
             break;
         }
         printf("Dbg 4\n");
@@ -202,14 +188,13 @@ int main (int argc, char *argv[]) {
                 }
             };
             
-        }
+        }       
         fclose(fp);
+        free(sFName);
         nsi++;
     }
 
 
-    fclose(fp);
     free(registros);
-    
-
+    return 0;
 }

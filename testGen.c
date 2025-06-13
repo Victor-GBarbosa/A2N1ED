@@ -22,7 +22,7 @@ int main (int argc, char *argv[]) {
 
     if (argc < 6) {
         printf("Erro: Argumentos insuficientes");
-        printf("Esperado: DD/MM/AAAA-00:00:00 DD/MM/AAAA 00:00:00 scan1 scan2 scan3 scan[...]");
+        printf("Esperado: DD/MM/AAAA-00:00:00 DD/MM/AAAA 00:00:00 scan1-scantype scan2-scantype scan3-scantype scan[...]-scantype...");
         return 0;
     }
 
@@ -43,16 +43,16 @@ int main (int argc, char *argv[]) {
         start.tm_year -= 1900; 
         end.tm_mon -= 1;
         end.tm_year -= 1900;
-        printf("Datas Cadastrados com sucesso");
+        printf("Datas Cadastrados com sucesso"); 
        } else {
         printf("Erro na entrada de dados");
-        return 0;
+        return 1;
        }
     
     for (int i = 5; i < argc; i++) {
         if (sscanf(argv[i], "%15[^-]-%d", sensors[i-5].name, &sensors[i-5].type) != 2) {
             printf("Falha ao registrar os sensores");
-            return 0;
+            return 1;
         }
     } 
 
@@ -80,8 +80,9 @@ int main (int argc, char *argv[]) {
 
         for (int j = 0; j < sensorQuantity; j++) {
             sensor_t sensor = {};
-            sensor.timestamp = gerar_timestamp_aleatorio(&start, &end);
-            strncpy(sensor.name, sensors[i].name, sizeof(sensor.name));
+            sensor.timestamp = gerar_timestamp_aleatorio(&start, &end);            
+            strncpy(sensor.name, sensors[i].name, sizeof(sensor.name) - 1);
+            sensor.name[sizeof(sensor.name) - 1] = '\0';
             sensor.type = sensors[i].type;
 
             switch (sensor.type) {

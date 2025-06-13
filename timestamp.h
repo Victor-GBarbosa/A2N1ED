@@ -32,5 +32,6 @@ time_t converter_para_timestap(int dia, int mes, int ano, int hora, int min, int
 time_t gerar_timestamp_aleatorio(struct tm * inicial, struct tm * final);
 
 sensor_t getRegister(char *linha);
+int contarLinhas(char* fileName, int ignore);
 
 #endif

@@ -29,28 +29,28 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
 
     int diasNoMes[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
-    if (ano < 1900 || ano > 9999) {
-        printf("Ano inválido.\n");
+    if (ano > 9999) {
+        printf("Ano invalido.\n");
         return 0;
     }
     if (mes < 1 || mes > 12) {
-        printf("Mês inválido.\n");
+        printf("Mês invalido.\n");
         return 0;
     }
     if (dia < 1 || dia > 31) {
-        printf("Dia inválido.\n");
+        printf("Dia invalido.\n");
         return 0;
     }
     if (hora < 0 || hora > 23) {
-        printf("Hora inválida.\n");
+        printf("Hora invalida.\n");
         return 0;
     }
     if (min < 0 || min > 59) {
-        printf("Minuto inválido.\n");
+        printf("Minuto invalido.\n");
         return 0;
     }
     if (seg < 0 || seg > 59) {
-        printf("Segundo inválido.\n");
+        printf("Segundo invalido.\n");
         return 0;
     }
     
@@ -58,7 +58,7 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
         diasNoMes[1] = 29;
     }
     if (dia > diasNoMes[mes - 1]) {
-        printf("Dia inválido para o mês especificado.\n");
+        printf("Dia invalido para o mês especificado.\n");
         return 0;
     }
 
@@ -66,12 +66,13 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
 }
 
 sensor_t getRegister(char *linha) {
-
+    
     sensor_t thisRegister;
     sensor_t err = {0};
 
     static char buffer[256];
-    strcpy(buffer, linha);
+    strncpy(buffer, linha, sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';
     
     char *token = strtok(buffer, " "); 
     if (token == NULL) return err;
@@ -79,7 +80,8 @@ sensor_t getRegister(char *linha) {
     
     token = strtok(NULL, " "); 
     if (token == NULL) return err;
-    strcpy(thisRegister.name, token);
+    strncpy(thisRegister.name, token, sizeof(thisRegister.name) - 1);
+    thisRegister.name[sizeof(thisRegister.name) - 1] = '\0';
       token = strtok(NULL, ""); 
     if (token == NULL) return err;
     thisRegister.type = typeVerify(token);
@@ -153,4 +155,19 @@ time_t gerar_timestamp_aleatorio(struct tm * inicial, struct tm * final) {
     time_t timestamp_aleatorio = timestamp_inicial + (time_t)((double)rand() / RAND_MAX * (timestamp_final - timestamp_inicial));
     
     return timestamp_aleatorio;
+}
+
+int contarLinhas(char* fileName, int ignore) {
+   FILE *fp = fopen(fileName, "r");
+   if (fp == NULL) {
+      printf("Erro ao abrir o arquivo 2");
+       return -1;
+   }
+   int contador = 0;
+   char linha[256]; 
+   while (fgets(linha, sizeof(linha), fp) != NULL) {
+       contador++; 
+   }
+   fclose(fp);
+   return contador - ignore;
 }
