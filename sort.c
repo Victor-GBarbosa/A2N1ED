@@ -8,11 +8,14 @@
 
 int main (int argc, char *argv[]) {
 
+    if (argc < 2) {
+        printf("Argumentos insuficientes");
+        return 1;
+    }
+
     char fname[256];
     strncpy(fname, argv[1], sizeof(fname) - 1);
     fname[sizeof(fname) - 1] = '\0';
-    printf("String copiada\n");
-    printf(fname);
     int fileLineCounter = contarLinhas(fname, 0);
 
     sensor_t *registros = malloc(sizeof(sensor_t) * fileLineCounter);
@@ -23,8 +26,6 @@ int main (int argc, char *argv[]) {
         printf("Erro ao abrir o arquivo 1\n");
         return 1;
     }
-
-    printf("\nDebug: Teste 1\n");
 
     fseek(fp, 0, SEEK_SET);
     char linha[256];
@@ -65,9 +66,9 @@ int main (int argc, char *argv[]) {
         }
         
         registrosValidos++;
-    }    printf("Debug: %d registros válidos processados!\n", registrosValidos);
+    }
 
-    int contador, j = 0, k = 0;
+    int contador, j = 0;
     sensor_t tempReg;
     do {
       contador = 0;
@@ -132,17 +133,15 @@ int main (int argc, char *argv[]) {
     
     char *sFName = NULL;
     int nsi = 0;
-    printf("Dbg 1\n");
 
     while (nomeSensores[nsi] != NULL) {
         sFName = malloc(strlen(nomeSensores[nsi]) + 5);
-        sprintf(sFName,"%s.txt", nomeSensores[nsi]);        printf("Dbg 2\n");
+        sprintf(sFName,"%s.txt", nomeSensores[nsi]);
         if (sFName == NULL) {
             printf("Erro ao alocar memoria para o nome do arquivo: %s.txt", nomeSensores[nsi]);
             free(sFName);
             break;
         }
-        printf("Dbg 3\n");
         fp = fopen(sFName, "w");
 
         if (fp == NULL) {
@@ -150,7 +149,7 @@ int main (int argc, char *argv[]) {
             free(sFName);
             break;
         }
-        printf("Dbg 4\n");
+        
         for (int i = 0; i < registrosValidos; i++) {
             if (!strcmp(registros[i].name, nomeSensores[nsi])) {
                 switch (registros[i].type)  {
@@ -194,7 +193,7 @@ int main (int argc, char *argv[]) {
         nsi++;
     }
 
-
+    printf("Arquivo ordenado com sucesso!");
     free(registros);
     return 0;
 }

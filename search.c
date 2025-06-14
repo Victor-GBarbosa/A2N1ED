@@ -7,26 +7,25 @@
 
 int main (int argc, char  *argv[]) {
 
+    if (argc < 4) {
+        printf("Argumentos insuficientes\nEsperado: .\nome.exe dd/mm/yyyy hh:mm:ss arquivo.txt arquivo2.txt...");
+        return 1;
+    }
+
     struct tm targetDate;
     if(sscanf(argv[1], "%d/%d/%d", &targetDate.tm_mday, &targetDate.tm_mon, &targetDate.tm_year) == 3 &&
        sscanf(argv[2], "%d:%d:%d", &targetDate.tm_hour, &targetDate.tm_min, &targetDate.tm_sec) == 3) 
-       {
-        printf("Data Cadastrada com sucesso\n");
-
-        } else {
+       {} else {
         printf("Erro na entrada de dados\n");
         return 1;
-        }
+        }    
 
     long int targetTs = converter_para_timestap(targetDate.tm_mday, targetDate.tm_mon, targetDate.tm_year,
                                                 targetDate.tm_hour, targetDate.tm_min, targetDate.tm_sec);   
-                                             
-    printf("Timestamp alvo: %ld\n", targetTs);
 
     char linha[256];
 
     for (int i = 3; i < argc; i++) {
-        printf("\nProcessando arquivo: %s\n", argv[i]);
         
         FILE *fp = fopen(argv[i], "r"); 
         if (fp == NULL) {
@@ -65,10 +64,7 @@ int main (int argc, char  *argv[]) {
             free(registros);
             continue;
         }
-           
-        //busca binaria para o ts mais proximo
-
-        int left = 0;
+             int left = 0;
         int right = registrosValidos - 1;
         int closest = 0;
         long int minDiff = labs(registros[0].timestamp - targetTs);
@@ -78,13 +74,11 @@ int main (int argc, char  *argv[]) {
             long int currentTs = registros[mid].timestamp;
             long int diff = labs(currentTs - targetTs);
             
-            // Atualizar o mais próximo se encontrou diferença menor
             if (diff < minDiff) {
                 minDiff = diff;
                 closest = mid;
             }
             
-            // Se encontrou exato, pode parar
             if (currentTs == targetTs) {
                 closest = mid;
                 break;
@@ -93,10 +87,28 @@ int main (int argc, char  *argv[]) {
             } else {
                 right = mid - 1;
             }
+        }        time_t timestamp = (time_t)registros[closest].timestamp;
+        struct tm *date_info = localtime(&timestamp);
+        printf("\nSensor encontrado em: %02d/%02d/%04d %02d:%02d:%02d\nNome: %s\nTipo: ", 
+        date_info->tm_mday, date_info->tm_mon + 1, date_info->tm_year + 1900,
+        date_info->tm_hour, date_info->tm_min, date_info->tm_sec, registros[closest].name);
+        
+        switch(registros[closest].type) {
+            case INTEGER:
+                printf("INTEGER\nValor: %d", registros[closest].value.intType);
+                break;
+            case BOOLEAN:
+                printf("BOOLEAN\nValor: %s", registros[closest].value.boolType ? "true" : "false");
+                break;
+            case DOUBLE:
+                printf("DOUBLE\nValor: %.2f", registros[closest].value.doubleType);
+                break;
+            case STRING:
+                printf("STRING\nValor: %s", registros[closest].value.stringType);
+                break;
         }
         
-        printf("\n----------\n\nTimestamp encontrado: %ld\nNo arquivo: %s\nDiferença: %ld segundos\n\n----------\n", 
-        registros[closest].timestamp, argv[i], minDiff);
+        printf("\nNo arquivo: %s\nDiferenca: %ld segundos\n\n----------\n", argv[i], minDiff);
         
         free(registros); //limpa os registros para o proximo arquivo
     } //termina de procurar em 1 arquivo;
