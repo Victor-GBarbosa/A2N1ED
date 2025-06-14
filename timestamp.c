@@ -34,7 +34,7 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
         return 0;
     }
     if (mes < 1 || mes > 12) {
-        printf("Mês invalido.\n");
+        printf("Mes invalido.\n");
         return 0;
     }
     if (dia < 1 || dia > 31) {
@@ -58,7 +58,7 @@ int isValidDateTime(int dia, int mes, int ano, int hora, int min, int seg) {
         diasNoMes[1] = 29;
     }
     if (dia > diasNoMes[mes - 1]) {
-        printf("Dia invalido para o mês especificado.\n");
+        printf("Dia invalido para o mes especificado.\n");
         return 0;
     }
 

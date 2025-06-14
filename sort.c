@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
 
     FILE *fp = fopen(argv[1], "r");
     if (fp == NULL) {
-        printf("Erro ao abrir o arquivo 1\n");
+        printf("Erro ao abrir o arquivo\n");
         return 1;
     }
 

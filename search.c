@@ -18,7 +18,11 @@ int main (int argc, char  *argv[]) {
        {} else {
         printf("Erro na entrada de dados\n");
         return 1;
-        }    
+        }  
+        
+        if (!isValidDateTime(targetDate.tm_mday, targetDate.tm_mon, targetDate.tm_year, targetDate.tm_hour, targetDate.tm_min, targetDate.tm_sec)) {
+            return 1;
+        }
 
     long int targetTs = converter_para_timestap(targetDate.tm_mday, targetDate.tm_mon, targetDate.tm_year,
                                                 targetDate.tm_hour, targetDate.tm_min, targetDate.tm_sec);   
@@ -89,7 +93,7 @@ int main (int argc, char  *argv[]) {
             }
         }        time_t timestamp = (time_t)registros[closest].timestamp;
         struct tm *date_info = localtime(&timestamp);
-        printf("\nSensor encontrado em: %02d/%02d/%04d %02d:%02d:%02d\nNome: %s\nTipo: ", 
+        printf("\nSensor encontrado em: %02d/%02d/%04d %02d:%02d:%02d\nNome: %s\nTipo: ",
         date_info->tm_mday, date_info->tm_mon + 1, date_info->tm_year + 1900,
         date_info->tm_hour, date_info->tm_min, date_info->tm_sec, registros[closest].name);
         
