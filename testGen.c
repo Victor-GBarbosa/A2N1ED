@@ -39,11 +39,17 @@ int main (int argc, char *argv[]) {
 
     if(sscanf(argv[1], "%d/%d/%d", &start.tm_mday, &start.tm_mon, &start.tm_year) == 3 && sscanf(argv[2], "%d:%d:%d", &start.tm_hour, &start.tm_min, &start.tm_sec) == 3 &&
        sscanf(argv[3], "%d/%d/%d", &end.tm_mday, &end.tm_mon, &end.tm_year) == 3 && sscanf(argv[4], "%d:%d:%d", &end.tm_hour, &end.tm_min, &end.tm_sec) == 3) {
+    
+
+        if (!isValidDateTime(start.tm_mday, start.tm_mon, start.tm_year, start.tm_hour, start.tm_min, start.tm_sec) || !isValidDateTime(end.tm_mday, end.tm_mon, end.tm_year, end.tm_hour, end.tm_min, end.tm_sec)) {
+            return 1;
+        }
+        
         start.tm_mon -= 1;
         start.tm_year -= 1900; 
         end.tm_mon -= 1;
         end.tm_year -= 1900;
-        printf("Datas Cadastrados com sucesso"); 
+        printf("Datas Cadastrados com sucesso\n"); 
        } else {
         printf("Erro na entrada de dados");
         return 1;

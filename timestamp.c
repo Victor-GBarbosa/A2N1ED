@@ -113,7 +113,10 @@ sensor_t getRegister(char *linha) {
 
 time_t converter_para_timestap(int dia, int mes, int ano, int hora, int min, int seg) {
 
-    isValidDateTime(dia, mes, ano, hora, min, seg);
+    if (!isValidDateTime(dia, mes, ano, hora, min, seg)) {
+        printf("Erro ao converter data para timestamp;");
+        return 1;
+    }
 
     struct tm t;
 
